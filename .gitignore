@@ -6,3 +6,4 @@
 *.class
 *.iml
 node_modules/
+.tfvars
