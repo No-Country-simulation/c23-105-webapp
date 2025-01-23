@@ -7,6 +7,12 @@ resource "aws_security_group" "app_server" {
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }  
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -27,8 +33,8 @@ resource "aws_instance" "app_server" {
 
   user_data = <<-EOF
               #!/bin/bash
-              yum update -y
-              yum install -y java-17-amazon-corretto
+              sudo yum update -y
+              sudo amazon-linux-extras install java-openjdk21
               EOF
 
   tags = {

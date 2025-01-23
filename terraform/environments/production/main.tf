@@ -21,11 +21,12 @@ module "vpc" {
 module "ec2" {
   source = "../../modules/ec2"
   
-  environment        = var.environment
+  environment       = var.environment
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   instance_type     = var.instance_type
   app_name          = var.app_name
+  key_name          = var.key_name
 }
 
 module "rds" {

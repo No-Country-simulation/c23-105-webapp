@@ -22,3 +22,8 @@ variable "app_name" {
   description = "Application name"
   type        = string
 }
+variable key_name{
+  description = "Key par"
+  type = string
+  sensitive = true
+}

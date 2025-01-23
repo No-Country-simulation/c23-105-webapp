@@ -43,3 +43,8 @@ variable "app_name" {
   type        = string
   default     = "Adapptado"
 }
+variable key_name{
+  description = "Key par"
+  type = string
+  sensitive = true
+}
