@@ -1,19 +1,39 @@
-resource "aws_db_instance" "main" {
-  identifier = "${var.app_name}-${var.environment}"
-  engine = "postgres"
-  engine_version = "13.7"
-  instance_class = var.instance_class
-  db_name = var.db_name
-  username = var.db_username
-  password = var.db_password
-  
+resource "aws_security_group" "database" {
+  name_prefix = "${var.environment}-database-"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [var.app_security_group_id]
+  }
+}
+
+resource "aws_db_subnet_group" "database" {
+  name       = "${var.environment}-database"
+  subnet_ids = var.private_subnet_ids
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "aws_db_instance" "database" {
+  identifier        = "${var.environment}-database"
+  engine            = "postgres"
+  engine_version    = "14"
+  instance_class    = var.db_instance_class
   allocated_storage = 20
-  storage_type = "gp2"
-  
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  db_subnet_group_name = aws_db_subnet_group.main.name
-  
-  skip_final_snapshot = true
+
+  db_name  = "nocountrydb"
+  username = "dbadmin"
+  password = var.db_password
+
+  db_subnet_group_name   = aws_db_subnet_group.database.name
+  vpc_security_group_ids = [aws_security_group.database.id]
+
+  skip_final_snapshot     = true
   
   tags = {
     Environment = var.environment

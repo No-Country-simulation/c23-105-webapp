@@ -1,53 +1,47 @@
 terraform {
   required_providers {
     aws = {
-        source = "hashicorp/aws"
-        version = "~> 5.0"
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
   }
-  backend "s3" {
-    bucket = "value"
-    key = "c23-105-webapp/terraform/environments/production/terraform.tfstate"
-    region = "us-east-1"
-  }
 }
+
 provider "aws" {
   region = var.aws_region
 }
+
 module "vpc" {
-    source = "../../modules/vpc"
-    environment = var.environment
-    app_name = var.app_name
+  source = "../../modules/vpc"
+  
+  environment = var.environment
+  vpc_cidr    = var.vpc_cidr
+}
+
+module "ec2" {
+  source = "../../modules/ec2"
+  
+  environment        = var.environment
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  instance_type     = var.instance_type
+  app_name          = var.app_name
 }
 
 module "rds" {
   source = "../../modules/rds"
-  environment = var.environment
-  app_name = var.app_name
-  vpc_id = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
-  instance_class = var.rds_instance_class
-  db_name = var.db_name
-  db_username = var.db_username
-  db_password = var.db_password
+  
+  environment           = var.environment
+  vpc_id               = module.vpc.vpc_id
+  private_subnet_ids   = module.vpc.private_subnet_ids
+  db_instance_class    = var.db_instance_class
+  db_password         = var.db_password
+  app_security_group_id = module.ec2.security_group_id
 }
 
 module "s3" {
   source = "../../modules/s3"
+  
   environment = var.environment
-  app_name = var.app_name
-}
-
-module "lambda" {
-  source = "../../modules/lambda"
-  environment = var.environment
-  app_name = var.app_name
-  ecr_repository_url = "418295719584.dkr.ecr.${var.aws_region}.amazonaws.com/java21"
-  ecr_image_tag = var.ecr_image_tag
-  vpc_id = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
-  rds_endpoint = module.rds.endpoint
-  db_name = var.db_name
-  db_username = var.db_username
-  db_password = var.db_password
+  bucket_name = var.bucket_name
 }

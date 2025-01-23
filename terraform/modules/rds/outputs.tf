@@ -1,7 +1,7 @@
 output "endpoint" {
-  value = aws_db_instance.main.endpoint
+  value = aws_db_instance.database.endpoint
 }
 
-output "db_name" {
-  value = aws_db_instance.main.db_name
+output "database_name" {
+  value = aws_db_instance.database.db_name
 }

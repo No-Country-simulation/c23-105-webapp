@@ -1,28 +1,45 @@
-variable "aws_region" {
-    default = "us-east-1"    
-}
 variable "environment" {
-    default = "production"    
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}
+
+variable "aws_region" {
+  description = "AWS Region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_password" {
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "bucket_name" {
+  description = "S3 bucket name"
+  type        = string
 }
 variable "app_name" {
-    default = "FriendlySpot"    
-}
-variable "ecr_image_tag" {
-  default = "latest"
-}
-variable "rds_instance_class" {
-  default = "db.t4g.micro"
-}
-variable "db_name" {
-  default = "prod_db"
-}
-variable "db_username" {
-  description = "Database administrator username"
+  description = "Application name"
   type        = string
-  sensitive   = true
-}
-variable "db_password" {
-  description = "Database administrator password"
-  type        = string
-  sensitive   = true
+  default     = "Adapptado"
 }

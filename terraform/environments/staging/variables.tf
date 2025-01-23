@@ -7,7 +7,7 @@ variable "environment" {
 }
 
 variable "app_name" {
-  default = "FriendlySpot"
+  default = "Adapptado"
 }
 
 variable "ecr_image_tag" {

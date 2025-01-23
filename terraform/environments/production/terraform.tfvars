@@ -1,2 +1,6 @@
-db_username = "bdProd"
-db_password = "bdProd123."
+aws_region       = "us-east-1"
+environment      = "production"
+vpc_cidr         = "10.0.0.0/16"
+instance_type    = "t2.micro"
+db_instance_class = "db.t3.micro"
+bucket_name      = "nocountry-assets"

@@ -6,8 +6,8 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "your-terraform-state-bucket"
-    key    = "c23-105/staging/terraform.tfstate"
+    bucket = "tfstate-stage-adapptado"
+    key    = "c23-105-webapp/terraform/environments/staging/remote-state/terraform.tfstate"
     region = "us-east-1"
   }
 }

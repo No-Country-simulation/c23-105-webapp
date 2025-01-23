@@ -1,33 +1,30 @@
 variable "environment" {
-  type = string
-}
-
-variable "app_name" {
-  type = string
+  description = "Environment name"
+  type        = string
 }
 
 variable "vpc_id" {
-  type = string
+  description = "VPC ID"
+  type        = string
 }
 
-variable "subnet_ids" {
-  type = list(string)
+variable "private_subnet_ids" {
+  description = "Private subnet IDs"
+  type        = list(string)
 }
 
-variable "instance_class" {
-  type = string
-}
-
-variable "db_name" {
-  type = string
-}
-
-variable "db_username" {
-  type = string
-  sensitive = true
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
 }
 
 variable "db_password" {
-  type = string
-  sensitive = true
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "app_security_group_id" {
+  description = "Security group ID of the application"
+  type        = string
 }

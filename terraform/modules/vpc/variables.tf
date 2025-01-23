@@ -1,9 +1,9 @@
 variable "environment" {
-  type = string
-  description = "Environment name (staging/production)"
+  description = "Environment name"
+  type        = string
 }
 
-variable "app_name" {
-  type = string
-  description = "Application name"
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
 }
