@@ -1,7 +1,7 @@
 variable "environment" {
   description = "Environment name"
   type        = string
-  default     = "production"
+  default     = "staging"
 }
 
 variable "aws_region" {
@@ -38,13 +38,21 @@ variable "bucket_name" {
   description = "S3 bucket name"
   type        = string
 }
+
 variable "app_name" {
   description = "Application name"
   type        = string
   default     = "Adapptado"
 }
-variable key_name{
-  description = "Key par"
-  type = string
-  sensitive = true
+
+variable "key_name" {
+  description = "Key pair name for EC2"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_ssh_key" {
+  description = "SSH private key to access the private GitHub repository"
+  type        = string
+  sensitive   = true
 }
