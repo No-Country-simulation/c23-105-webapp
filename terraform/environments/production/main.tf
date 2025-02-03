@@ -28,6 +28,11 @@ module "ec2" {
   app_name          = var.app_name
   key_name          = var.key_name
   github_ssh_key    = var.github_ssh_key
+  aws_region        = var.aws_region
+  ecr_registry      = var.ecr_registry
+  ecr_repository    = var.ecr_repository
+  rds_endpoint      = module.rds.endpoint
+  db_password       = var.db_password
 }
 
 module "rds" {

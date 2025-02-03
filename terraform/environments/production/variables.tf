@@ -56,3 +56,12 @@ variable "github_ssh_key" {
   type        = string
   sensitive   = true
 }
+variable "ecr_registry" {
+  description = "ECR Registry URL"
+  type        = string
+}
+
+variable "ecr_repository" {
+  description = "ECR Repository Name"
+  type        = string
+}
