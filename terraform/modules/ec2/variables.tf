@@ -1,52 +1,36 @@
 variable "environment" {
   description = "Environment name"
   type        = string
-  default     = "production"
 }
 
-variable "aws_region" {
-  description = "AWS Region"
+variable "vpc_id" {
+  description = "VPC ID"
   type        = string
-  default     = "us-east-1"
 }
 
-variable "vpc_cidr" {
-  description = "CIDR block for VPC"
-  type        = string
-  default     = "10.0.0.0/16"
+variable "public_subnet_ids" {
+  description = "Public subnet IDs"
+  type        = list(string)
 }
 
 variable "instance_type" {
   description = "EC2 instance type"
-  type        = string
-  default     = "t2.micro"
-}
-
-variable "db_instance_class" {
-  description = "RDS instance class"
-  type        = string
-  default     = "db.t3.micro"
-}
-
-variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true
-}
-
-variable "bucket_name" {
-  description = "S3 bucket name"
   type        = string
 }
 
 variable "app_name" {
   description = "Application name"
   type        = string
-  default     = "Adapptado"
 }
 
 variable "key_name" {
   description = "Key pair name for EC2"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "Database password"
   type        = string
   sensitive   = true
 }
@@ -56,6 +40,11 @@ variable "github_ssh_key" {
   type        = string
   sensitive   = true
 }
+variable "aws_region" {
+  description = "AWS Region"
+  type        = string
+}
+
 variable "ecr_registry" {
   description = "ECR Registry URL"
   type        = string
@@ -64,4 +53,15 @@ variable "ecr_registry" {
 variable "ecr_repository" {
   description = "ECR Repository Name"
   type        = string
+}
+
+variable "rds_endpoint" {
+  description = "RDS Endpoint"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Database Password"
+  type        = string
+  sensitive   = true
 }
