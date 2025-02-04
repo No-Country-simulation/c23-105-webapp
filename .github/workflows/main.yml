@@ -41,5 +41,3 @@ jobs:
           script: |
             sudo -u ec2-user /home/ec2-user/restart_container.sh
             - name: Health Check
-  run: |
-    curl -sSf http://${{ secrets.EC2_IP }}:8080/actuator/health
