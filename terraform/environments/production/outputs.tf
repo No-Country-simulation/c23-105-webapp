@@ -16,5 +16,5 @@ output "s3_bucket_name" {
 }
 
 output "lambda_function_name" {
-  value = module.autoscaling.lambda_function_name
+  value = module.auto-stop.lambda_function_name
 }
