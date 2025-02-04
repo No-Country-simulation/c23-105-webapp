@@ -3,15 +3,21 @@ name: Deploy Spring Boot to EC2
 on:
   push:
     branches: [main]
+    paths:
+      - 'backend/**'
 
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: adapptado-backend
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-
+  BACKEND_DIR: backend
+  
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_DIR }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
