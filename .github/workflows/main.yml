@@ -6,8 +6,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECR_REPOSITORY: adapptado-backend
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
 
 jobs:
   build-and-deploy:
@@ -39,5 +39,14 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo -u ec2-user /home/ec2-user/restart_container.sh
-            - name: Health Check
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            docker stop adapptado-backend || true
+            docker rm adapptado-backend || true
+            docker run -d \
+              --name adapptado-backend \
+              -p 8080:8080 \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://${module.rds.endpoint}/nocountrydb \
+              -e SPRING_DATASOURCE_USERNAME=dbadmin \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
