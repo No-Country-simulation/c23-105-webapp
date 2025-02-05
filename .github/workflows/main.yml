@@ -44,23 +44,27 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Iniciar el servicio Docker (usamos sudo -E para preservar las variables de entorno)
-            sudo -E service docker start
-            # Autenticar en ECR
-            aws ecr get-login-password --region $AWS_REGION | sudo -E docker login --username AWS --password-stdin $ECR_REGISTRY
-            # Descargar la última imagen
-            sudo -E docker pull $ECR_REGISTRY/${ECR_REPOSITORY}:latest
-            # Detener y remover el contenedor anterior, si existe
-            sudo -E docker stop adapptado-backend || true
-            sudo -E docker rm adapptado-backend || true
-            # Ejecutar el contenedor
-            sudo -E docker run -d \
+            # Iniciar el servicio Docker
+            sudo service docker start
+
+            # Autenticarse en ECR: se pasan explícitamente las variables de entorno a sudo
+            aws ecr get-login-password --region "$AWS_REGION" | sudo env AWS_REGION="$AWS_REGION" ECR_REGISTRY="$ECR_REGISTRY" docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
+            # Descargar la última imagen de ECR
+            sudo env ECR_REGISTRY="$ECR_REGISTRY" ECR_REPOSITORY="$ECR_REPOSITORY" docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+            # Detener y remover el contenedor previo, si existe
+            sudo docker stop adapptado-backend || true
+            sudo docker rm adapptado-backend || true
+
+            # Ejecutar el contenedor, pasando el endpoint de RDS y demás variables
+            sudo env RDS_ENDPOINT="$RDS_ENDPOINT" ECR_REGISTRY="$ECR_REGISTRY" ECR_REPOSITORY="$ECR_REPOSITORY" docker run -d \
               --name adapptado-backend \
               -p 8080:8080 \
-              -e SPRING_DATASOURCE_URL=jdbc:postgresql://$RDS_ENDPOINT/nocountrydb \
+              -e SPRING_DATASOURCE_URL="jdbc:postgresql://$RDS_ENDPOINT/nocountrydb" \
               -e SPRING_DATASOURCE_USERNAME=dbadmin \
-              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              $ECR_REGISTRY/${ECR_REPOSITORY}:latest
+              -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
