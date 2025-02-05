@@ -9,7 +9,8 @@ env:
   ECR_REPOSITORY: adapptado-backend
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
   BACKEND_DIR: backend
-  
+  RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -42,15 +43,27 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          tty: true
           script: |
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-            docker stop adapptado-backend || true
-            docker rm adapptado-backend || true
-            docker run -d \
+            # Iniciar Docker en caso de que no esté corriendo
+            sudo service docker start
+            # Autenticar en ECR
+            aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
+            # Descargar la última imagen
+            sudo docker pull $ECR_REGISTRY/${ECR_REPOSITORY}:latest
+            # Detener y remover el contenedor anterior, si existe
+            sudo docker stop adapptado-backend || true
+            sudo docker rm adapptado-backend || true
+            # Ejecutar el contenedor
+            sudo docker run -d \
               --name adapptado-backend \
               -p 8080:8080 \
-              -e SPRING_DATASOURCE_URL=jdbc:postgresql://${module.rds.endpoint}/nocountrydb \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://$RDS_ENDPOINT/nocountrydb \
               -e SPRING_DATASOURCE_USERNAME=dbadmin \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+              $ECR_REGISTRY/${ECR_REPOSITORY}:latest
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          ECR_REGISTRY: ${{ env.ECR_REGISTRY }}
+          RDS_ENDPOINT: ${{ env.RDS_ENDPOINT }}
