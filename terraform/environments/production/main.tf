@@ -52,12 +52,3 @@ module "s3" {
   environment = var.environment
   bucket_name = var.bucket_name
 }
-
-module "auto-stop" {
-  source = "../../modules/auto-stop"
-
-  environment    = var.environment
-  ec2_instance_id = module.ec2.instance_id
-  rds_instance_id = module.rds.db_instance_id
-  
-}
