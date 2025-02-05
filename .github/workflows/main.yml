@@ -43,19 +43,18 @@ jobs:
           host: ${{ secrets.EC2_IP }}
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          tty: true
           script: |
-            # Iniciar Docker en caso de que no esté corriendo
-            sudo service docker start
+            # Iniciar el servicio Docker (usamos sudo -E para preservar las variables de entorno)
+            sudo -E service docker start
             # Autenticar en ECR
-            aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
+            aws ecr get-login-password --region $AWS_REGION | sudo -E docker login --username AWS --password-stdin $ECR_REGISTRY
             # Descargar la última imagen
-            sudo docker pull $ECR_REGISTRY/${ECR_REPOSITORY}:latest
+            sudo -E docker pull $ECR_REGISTRY/${ECR_REPOSITORY}:latest
             # Detener y remover el contenedor anterior, si existe
-            sudo docker stop adapptado-backend || true
-            sudo docker rm adapptado-backend || true
+            sudo -E docker stop adapptado-backend || true
+            sudo -E docker rm adapptado-backend || true
             # Ejecutar el contenedor
-            sudo docker run -d \
+            sudo -E docker run -d \
               --name adapptado-backend \
               -p 8080:8080 \
               -e SPRING_DATASOURCE_URL=jdbc:postgresql://$RDS_ENDPOINT/nocountrydb \
