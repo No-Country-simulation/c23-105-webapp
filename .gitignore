@@ -13,5 +13,5 @@ terraform.tfstate
 terraform-provider-aws_v5.84.0_x5
 modules.json
 LICENSE.txt 
-terraform.tfstate.backup
 terraform/environments/production/terraform.tfvars
+terraform.tfstate.backup
