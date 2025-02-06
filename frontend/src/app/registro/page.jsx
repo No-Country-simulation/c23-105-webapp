@@ -1,9 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
+import { Button } from "../components/ui/button"
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-secondary">
       {/* Columna izquierda - Ilustración */}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 items-center justify-center">
         <div className="relative w-full h-full">
@@ -84,9 +85,9 @@ export default function RegisterPage() {
               />
             </div>
 
-            <button type="submit" className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 rounded-md font-medium">
+            <Button type="submit" className="w-full py-3 px-4">
               CREÁ TU CUENTA
-            </button>
+            </Button>
           </form>
 
           <div className="text-center">

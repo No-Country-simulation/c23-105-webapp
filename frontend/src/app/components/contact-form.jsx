@@ -1,20 +1,15 @@
+import { Button } from "../components/ui/button"
+
 export function ContactForm() {
   return (
-    <section className="container py-12">
-      <h2 className="text-2xl font-bold text-center mb-8">CONTACTATE CON NOSOTROS</h2>
-      <form className="max-w-2xl mx-auto space-y-4">
-        <input type="email" placeholder="Correo electrónico" required className="w-full px-3 py-2 border rounded-md" />
-        <textarea
-          placeholder="Envía tu mensaje"
-          required
-          className="w-full min-h-[150px] px-3 py-2 border rounded-md"
-        />
-        <button
-          type="submit"
-          className="w-full px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
-        >
+    <section className="py-16">
+      <h2 className="text-3xl font-bold text-center mb-8">CONTACTATE CON NOSOTROS</h2>
+      <form className="max-w-2xl mx-auto space-y-6">
+        <input type="email" placeholder="Correo electrónico" className="w-full p-3 border rounded-md" required />
+        <textarea placeholder="Envía tu mensaje" className="w-full p-3 border rounded-md min-h-[200px]" required />
+        <Button type="submit" variant="primary" className="w-full">
           Enviar mensaje
-        </button>
+        </Button>
       </form>
     </section>
   )
