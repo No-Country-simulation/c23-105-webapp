@@ -1,7 +1,6 @@
 <div align="center">
 
-  <img src="![image_alt]([image_url](https://github.com/No-Country-simulation/c23-105-webapp/blob/912e6544fd953eab780105c7d971b3220fde0749/Logotipo.png))" alt="logo" width="200"  height="auto" />
-  
+![Descripción de la imagen](Logotipo.png)  
   <br/>
 
   <h3><b>Ad<em><strong>app</strong></em>tado</b><h3>
