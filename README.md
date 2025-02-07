@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="img/Adapptado_Logo.png" alt="logo" width="200"  height="auto" />
+  <img src="![image_alt]([image_url](https://github.com/No-Country-simulation/c23-105-webapp/blob/912e6544fd953eab780105c7d971b3220fde0749/Logotipo.png))" alt="logo" width="200"  height="auto" />
   
   <br/>
 
