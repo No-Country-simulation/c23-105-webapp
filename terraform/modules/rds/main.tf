@@ -39,3 +39,8 @@ resource "aws_db_instance" "database" {
     Environment = var.environment
   }
 }
+resource "aws_ssm_parameter" "rds_endpoint" {
+  name  = "/production/rds/endpoint"
+  type  = "String"
+  value = aws_db_instance.database.endpoint
+}

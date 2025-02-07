@@ -6,16 +6,29 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECR_REPOSITORY: adapptado-backend
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  BACKEND_DIR: backend
+  RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  EC2_IP: ${{ secrets.EC2_IP }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_DIR }}
+
     steps:
+      # Paso 1: Checkout del código
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Paso 2: Configurar credenciales de AWS
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -23,23 +36,66 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # Paso 3: Iniciar sesión en Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v1.0.0
 
+      # Paso 4: Construir, etiquetar y subir la imagen a Amazon ECR
       - name: Build, tag, and push image to Amazon ECR
         run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          docker build -t "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest" .
+          docker push "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            sudo -u ec2-user /home/ec2-user/restart_container.sh
-            - name: Health Check
-  run: |
-    curl -sSf http://${{ secrets.EC2_IP }}:8080/actuator/health
+      # Paso 5: Desplegar en EC2
+- name: Deploy to EC2
+  uses: appleboy/ssh-action@v1.0.0
+  with:
+    host: ${{ secrets.EC2_IP }}
+    username: ec2-user
+    key: ${{ secrets.SSH_PRIVATE_KEY }}
+    script: |
+      # Detener y eliminar el contenedor anterior si existe
+      echo "Stopping and removing old container (if exists)..."
+      sudo docker stop adapptado-backend || true
+      sudo docker rm adapptado-backend || true
+
+      # Limpiar imágenes antiguas
+      echo "Cleaning old images..."
+      sudo docker system prune -af
+
+      # Iniciar el servicio Docker si no está activo
+      echo "Starting Docker service..."
+      sudo systemctl start docker
+      sudo systemctl enable docker
+
+      # Iniciar sesión en ECR
+      echo "Logging in to ECR..."
+      aws ecr get-login-password --region "${{ env.AWS_REGION }}" | sudo docker login --username AWS --password-stdin "${{ env.ECR_REGISTRY }}"
+
+      # Descargar la última imagen desde ECR
+      echo "Pulling latest image..."
+      sudo docker pull "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
+
+      # Ejecutar el nuevo contenedor con variables de entorno y logs
+      echo "Running new container..."
+      sudo docker run -d \
+        --name adapptado-backend \
+        -p 8080:8080 \
+        --restart unless-stopped \
+        -e SPRING_PROFILES_ACTIVE=prod \
+        -e SPRING_DATASOURCE_URL="jdbc:postgresql://${{ env.RDS_ENDPOINT }}/nocountrydb" \
+        -e SPRING_DATASOURCE_USERNAME="dbadmin" \
+        -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+        -e AWS_REGION="${{ env.AWS_REGION }}" \
+        -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+        -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+        "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
+
+      # Verificar que el contenedor está corriendo
+      echo "Verifying container status..."
+      sudo docker ps
+      
+      # Mostrar los logs del contenedor
+      echo "Showing container logs..."
+      sudo docker logs adapptado-backend
