@@ -1,9 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
+import { Button } from "../components/ui/button"
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-secondary">
       {/* Columna izquierda - Formulario */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
@@ -57,10 +58,10 @@ export default function LoginPage() {
                 </Link>
               </div>
             </div>
-
-            <button type="submit" className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 rounded-md font-medium">
-              INICIAR SESIÓN
-            </button>
+            <Button type="submit" className="w-full" variant="primary" >
+            INICIAR SESIÓN
+            </Button>
+            
           </form>
 
           <div className="text-center">

@@ -8,10 +8,16 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: adapptado-backend
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  BACKEND_DIR: backend
+  # Se espera que definas RDS_ENDPOINT en tus secretos
+  RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_DIR }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,8 +35,8 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          docker build -t "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest" .
+          docker push "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -39,14 +45,24 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-            docker stop adapptado-backend || true
-            docker rm adapptado-backend || true
-            docker run -d \
+            echo "Starting Docker service..."
+            sudo service docker start
+
+            echo "Logging in to ECR..."
+            aws ecr get-login-password --region "${{ env.AWS_REGION }}" | sudo docker login --username AWS --password-stdin "${{ env.ECR_REGISTRY }}"
+
+            echo "Pulling latest image..."
+            sudo docker pull "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
+
+            echo "Stopping and removing old container (if exists)..."
+            sudo docker stop adapptado-backend || true
+            sudo docker rm adapptado-backend || true
+
+            echo "Running new container..."
+            sudo docker run -d \
               --name adapptado-backend \
               -p 8080:8080 \
-              -e SPRING_DATASOURCE_URL=jdbc:postgresql://${module.rds.endpoint}/nocountrydb \
-              -e SPRING_DATASOURCE_USERNAME=dbadmin \
-              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+              -e SPRING_DATASOURCE_URL="jdbc:postgresql://${{ env.RDS_ENDPOINT }}/nocountrydb" \
+              -e SPRING_DATASOURCE_USERNAME="dbadmin" \
+              -e SPRING_DATASOURCE_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+              "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"

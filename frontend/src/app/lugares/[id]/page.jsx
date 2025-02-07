@@ -1,7 +1,8 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Header } from "@/app/components/header"
-import { Footer } from "@/app/components/footer"
+import Image from "next/image";
+import Link from "next/link";
+import { Header } from "@/app/components/header";
+import { Footer } from "@/app/components/footer";
+import { Button } from "@/app/components/ui/button";
 
 export default function LocationDetail({ params }) {
   // En un caso real, estos datos vendrían de una API o base de datos
@@ -12,8 +13,18 @@ export default function LocationDetail({ params }) {
     reviews: 91218,
     description:
       "Estadio de fútbol y recinto de conciertos; sede del club River Plate y de la Copa Mundial de la FIFA de 1978.",
-    features: ["Apto silla de ruedas", "Apto visibilidad reducida", "Apto movilidad reducida"],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    features: [
+      "Apto silla de ruedas",
+      "Apto visibilidad reducida",
+      "Apto movilidad reducida",
+    ],
+    images: [
+      "/placeholder.svg",
+      "/placeholder.svg",
+      "/placeholder.svg",
+      "/placeholder.svg",
+      "/placeholder.svg",
+    ],
     reviews: [
       {
         id: 1,
@@ -40,10 +51,10 @@ export default function LocationDetail({ params }) {
           "Lorem ipsum dolor sit amet consectetur. Sem libero hac egestas donec diam in morbi. Ornare ut mi gravida tempus aenean et interdum feugiat tempus. Pellentesque eget duis felis scelerisque volutpat nullam interdum libero lorem. Fermentum id donec mi pretium lectus tincidunt. Arcu faucibus varius pharetra lectus hac quis porta velit ornare.",
       },
     ],
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-secondary flex flex-col">
       <Header />
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -59,7 +70,9 @@ export default function LocationDetail({ params }) {
                     fill
                     className="object-cover rounded-md"
                   />
-                  <div className="absolute bottom-0 right-0 bg-white px-2 py-1 text-sm">{42}</div>
+                  <div className="absolute bottom-0 right-0 bg-white px-2 py-1 text-sm">
+                    {42}
+                  </div>
                 </div>
               ))}
             </div>
@@ -74,46 +87,58 @@ export default function LocationDetail({ params }) {
               />
             </div>
 
-            {/* Mapa */}
-            <div className="lg:col-span-4 bg-gray-100 rounded-md p-4 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">🗺️</div>
-                <p className="text-sm">CAPTURA DE LA UBICACION. AL CLICKEAR DEBE LLEVARNOS A GOOGLE MAPS</p>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+              {/* Mapa */}
+              <div className="lg:col-span-full bg-gray-100 rounded-md p-4 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">🗺️</div>
+                  <p className="text-sm">
+                    CAPTURA DE LA UBICACION. AL CLICKEAR DEBE LLEVARNOS A GOOGLE
+                    MAPS
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Información del lugar */}
-          <div className="mb-8">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">{location.name}</h1>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex">
-                    {"★".repeat(location.rating)}
-                    {"☆".repeat(5 - location.rating)}
+              {/* Información del lugar */}
+              <div className="mb-8">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h1 className="text-3xl font-bold mb-2">{location.name}</h1>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex">
+                        {"★".repeat(location.rating)}
+                        {"☆".repeat(5 - location.rating)}
+                      </div>
+                      <span className="text-gray-600">
+                        {location.reviews.length} Reseñas
+                      </span>
+                    </div>
+                    <p className="text-gray-600">{location.description}</p>
                   </div>
-                  <span className="text-gray-600">{location.reviews.length} Reseñas</span>
                 </div>
-                <p className="text-gray-600">{location.description}</p>
-              </div>
-              <div className="flex gap-2">
-                <button className="p-2 hover:bg-gray-100 rounded-full">❤️</button>
-                <button className="p-2 hover:bg-gray-100 rounded-full">🔖</button>
+
+                {/* Características de accesibilidad */}
+                <div className="flex  gap-4 mb-4">
+                  {location.features.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <span>✓</span>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <button className="p-2 hover:bg-gray-100 rounded-full">
+                    ❤️
+                  </button>
+                  <button className="p-2 hover:bg-gray-100 rounded-full">
+                    🔖
+                  </button>
+                </div>
+                <Button className="px-4 py-2">PUBLICAR RESEÑA</Button>
               </div>
             </div>
-
-            {/* Características de accesibilidad */}
-            <div className="flex flex-wrap gap-4 mb-4">
-              {location.features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
-                  <span>✓</span>
-                  {feature}
-                </div>
-              ))}
-            </div>
-
-            <button className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">PUBLICAR RESEÑA</button>
           </div>
 
           {/* Reseñas */}
@@ -137,6 +162,5 @@ export default function LocationDetail({ params }) {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
-
