@@ -1,7 +1,7 @@
 <div align="center">
 
-  <img src="![image_alt]([image_url]Logotipo.png))" alt="logo" width="200"  height="auto" />
-  
+<img src="Logotipo.png" width="300">
+
   <br/>
 
   <h3><b>Ad<em><strong>app</strong></em>tado</b><h3>
