@@ -15,7 +15,13 @@ resource "aws_security_group" "app_server" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  ingress {
+    # Permitir ICMP para ping
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -58,42 +64,50 @@ resource "aws_instance" "app_server" {
   key_name      = var.key_name
   vpc_security_group_ids = [aws_security_group.app_server.id]
   associate_public_ip_address = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
   # User data para instalar Docker Compose y configurar ECR
   user_data = <<-EOF
               #!/bin/bash
-              # Actualizar el sistema
+              # Update system
               sudo yum update -y
-
-              # Instalar Docker
-              sudo amazon-linux-extras install docker -y
+              
+              # Install Java 21
+              sudo amazon-linux-extras install java-openjdk21 -y
+              
+              # Install Docker
+              sudo yum install -y docker
               sudo service docker start
-              sudo usermod -aG docker ec2-user
-
-              # Instalar Docker Compose
-              sudo curl -L "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-
-              # Configurar acceso a ECR
-              aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${var.ecr_registry}
-
-              # Crear un script para reiniciar el contenedor
-              cat <<EOL > /home/ec2-user/restart_container.sh
+              sudo systemctl enable docker
+              sudo usermod -a -G docker ec2-user
+              
+              # Install AWS CLI
+              sudo yum install -y aws-cli
+              
+              # Create script to run application
+              cat <<'SCRIPT' > /home/ec2-user/start-app.sh
               #!/bin/bash
-              docker pull ${var.ecr_registry}/${var.ecr_repository}:latest
+              
+              # Get the RDS endpoint from AWS Parameter Store (you'll need to store this)
+              RDS_ENDPOINT=$(aws ssm get-parameter --name "/production/rds/endpoint" --region us-east-1 --query "Parameter.Value" --output text)
+              
+              aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ***.dkr.ecr.us-east-1.amazonaws.com
+              
+              docker pull ***.dkr.ecr.us-east-1.amazonaws.com/adapptado-backend:latest
+              
               docker stop adapptado-backend || true
               docker rm adapptado-backend || true
-              docker run -d \\
-                --name adapptado-backend \\
-                -p 8080:8080 \\
-                -e SPRING_DATASOURCE_URL=jdbc:postgresql://${var.rds_endpoint}/nocountrydb \\
-                -e SPRING_DATASOURCE_USERNAME=dbadmin \\
-                -e SPRING_DATASOURCE_PASSWORD=${var.db_password} \\
-                ${var.ecr_registry}/${var.ecr_repository}:latest
-              EOL
-
-              # Hacer ejecutable el script
-              chmod +x /home/ec2-user/restart_container.sh
+              
+              docker run -d \
+                --name adapptado-backend \
+                -p 8080:8080 \
+                -e SPRING_DATASOURCE_URL="jdbc:postgresql://$RDS_ENDPOINT/nocountrydb" \
+                -e SPRING_DATASOURCE_USERNAME=dbadmin \
+                -e SPRING_DATASOURCE_PASSWORD=*** \
+                ***.dkr.ecr.us-east-1.amazonaws.com/adapptado-backend:latest
+              SCRIPT
+              
+              chmod +x /home/ec2-user/start-app.sh
               EOF
 
   tags = {
