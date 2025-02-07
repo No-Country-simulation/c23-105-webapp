@@ -1,6 +1,7 @@
 <div align="center">
 
 ![Descripción de la imagen](Logotipo.png)  
+<img src="Logotipo.png" width="200">
   <br/>
 
   <h3><b>Ad<em><strong>app</strong></em>tado</b><h3>
