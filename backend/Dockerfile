@@ -6,7 +6,7 @@ FROM amazoncorretto:21
 WORKDIR /app
 
 # Copiar el JAR construido (asumiendo que el JAR se llama app.jar)
-COPY target/*.jar app.jar
+COPY target/Adapptado-1.jar app.jar
 
 # Exponer el puerto de la aplicación
 EXPOSE 8080
