@@ -39,17 +39,24 @@ Adapptado es una aplicación web diseñada para facilitar la vida de las persona
 
 ## 🛠 Stack Tecnológico
 
-1- HTML.  
-2- CSS.  
-3- React Js.  
-
-### Links al stack Tecnológico
-
-<ul>
-  <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML">HTML</a></li>
-  <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS">CSS</a></li>
-  <li><a href="https://react.dev/">REACT</a></li>
-</ul>
+1- Drive
+2.- Google Docs.
+3.- Google Sheet
+4.- Trello.
+5.- Figma.
+6.- Figjam
+7.- HTML.  
+8- Tailwind CSS.  
+9- React Js.
+10.- Next Js.
+11.- Java.
+12.- Spring.
+13.- JUnit.
+14.- Mockito.
+15. JWT.
+16.- PostGreSQL
+17.- AWS.
+18.- Terraform
 
 <!-- Live Demo -->
 
