@@ -1,9 +1,7 @@
 <div align="center">
 
-<img src="Logotipo.png" width="200">
+<img src="Logotipo.png" width="300">
 
-# No así:
-![Descripción](Logotipo.png)  <img src="Logotipo.png" width="200">
   <br/>
 
   <h3><b>Ad<em><strong>app</strong></em>tado</b><h3>
